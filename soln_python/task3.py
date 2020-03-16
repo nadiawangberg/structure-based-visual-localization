@@ -35,7 +35,8 @@ n = len(uv1)
 X = np.array([linear_triangulation(uv1[i], uv2[i], P1, P2) \
     for i in range(n)])
 
-show_point_cloud(X,
-    xlim=[-0.6,+0.6],
-    ylim=[-0.6,+0.6],
-    zlim=[+3.0,+4.2])
+X=np.vstack((X,[0,0,0]))
+show_point_cloud(X,0,0,1,
+    xlim=[-0.6,+1],
+    ylim=[-0.6,+1],
+    zlim=[-0.6,+5])
