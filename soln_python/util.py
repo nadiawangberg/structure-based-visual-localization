@@ -63,7 +63,7 @@ def show_point_matches(I1, I2, uv1, uv2, F=None):
             l = F@np.array((u1,v1,1))
             draw_line(l, linewidth='1', color=colors[i])
     plt.tight_layout()
-def draw_frame(K, T, scale,ax):
+def draw_frame( T, scale,ax):
     """
     K: 3x3 Camera intrinsic matrix
     T: 4x4 Homogeneous transformation (object to camera coordinates)
@@ -81,25 +81,29 @@ def draw_frame(K, T, scale,ax):
     plt.plot([uv0[0], uvy[0]], [uv0[1], uvy[1]], color='#11ff33')
     plt.plot([uv0[0], uvz[0]], [uv0[1], uvz[1]], color='#3366ff')
     """
+    """
+    xyz0=T@np.array([0,0,0,1])
+    x1=T@np.array([0,1,0,1])
+    y1=T@np.array([-1,0,0,1])
+    z1=T@np.array([0,0,-1,1])
+    """
     xyz0=T@np.array([0,0,0,1])
     x1=T@np.array([1,0,0,1])
     y1=T@np.array([0,1,0,1])
     z1=T@np.array([0,0,1,1])
-    
-    
+
+
     print(xyz0)
     ax.plot([xyz0[0],x1[0]], [xyz0[1],x1[1]],[xyz0[2],x1[2]],color='#FF0000')
     ax.plot([xyz0[0],y1[0]], [xyz0[1],y1[1]],[xyz0[2],y1[2]], color='#11ff33')
     ax.plot([xyz0[0],z1[0]], [xyz0[1],z1[1]],[xyz0[2],z1[2]], color='#3366ff')
     
-def show_point_cloud(X, K,T,scale,xlim, ylim, zlim):
+def show_point_cloud(X,T,ax,scale,xlim, ylim, zlim):
     """
     Creates a mouse-controllable 3D plot of the input points.
     """
-    plt.figure(figsize=(6,6))
-    ax = plt.axes(projection='3d')
-
-    draw_frame(K,T,scale,ax)
+    T=np.eye(4)
+    #draw_frame(T,scale,ax)
 
 
 
@@ -113,6 +117,31 @@ def show_point_cloud(X, K,T,scale,xlim, ylim, zlim):
     ax.set_ylim(zlim)
     ax.set_zlim([ylim[1], ylim[0]])
     ax.set_xlabel('x')
-    ax.set_zlabel('y')
-    ax.set_ylabel('z')
+    ax.set_zlabel('z')
+    ax.set_ylabel('y')
     plt.show()
+def R_x(theta):
+    theta=np.deg2rad(theta)
+    R=np.identity(4)
+    R[1,1]=np.cos(theta)
+    R[1,2]=-np.sin(theta)
+    R[2,1]=np.sin(theta)
+    R[2,2]=np.cos(theta)
+    return R
+def R_y(theta):
+    theta=np.deg2rad(theta)
+
+    R=np.identity(4)
+    R[0,0]=np.cos(theta)
+    R[2,0]=-np.sin(theta)
+    R[0,2]=np.sin(theta)
+    R[2,2]=np.cos(theta)
+    return R
+def R_z(theta):
+    theta=np.deg2rad(theta)
+    R=np.identity(4)
+    R[0,0]=np.cos(theta)
+    R[1,0]=np.sin(theta)
+    R[0,1]=-np.sin(theta)
+    R[1,1]=np.cos(theta)
+    return R

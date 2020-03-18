@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 import numpy as np
+import cv2
 from util import *
 from eight_point import *
 from epipolar_match import *
@@ -34,14 +35,34 @@ P1,P2 = camera_matrices(K1, K2, R, t)
 n = len(uv1)
 X = np.array([linear_triangulation(uv1[i], uv2[i], P1, P2) \
     for i in range(n)])
-T_v=np.array([[1,0,0,1],[0,1,0,0],[0,0,1,0],[0,0,0,0]])
+x=0
+y=0
+z=0
+T_v=np.array([[1,0,0,x],[0,1,0,y],[0,0,1,z],[0,0,0,1]])
 
-T_r=np.array([[-1,0,0,0],[0,-1,0,0],[0,0,-1,0],[0,0,0,-1]])
-T=T_v@T_r
+T_r=np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
+T=T_v@R_y(30)
 #T=np.eye(4)
+X=np.array(X,dtype='float32')
+uv2=np.array(uv2,dtype='float32')
+dist_coeffs = np.zeros((4,1))
+(success, rotation_vector, translation_vector) = cv2.solvePnP(X, uv2, K2, dist_coeffs)
+
+print(success)
+
 X=np.vstack((X,[0,0,0]))
-print(T)
-show_point_cloud(X,0,T,1,
+
+print(rotation_vector)
+
+
+
+plt.figure(figsize=(6,6))
+ax = plt.axes(projection='3d')
+draw_frame(T,1,ax)
+
+
+show_point_cloud(X,T,ax,1,
     xlim=[-0.6,+1],
     ylim=[-0.6,+1],
     zlim=[-0.6,+5])
+
