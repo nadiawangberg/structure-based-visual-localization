@@ -92,8 +92,8 @@ def draw_frame( T, scale,ax):
     y1=T@np.array([0,1,0,1])
     z1=T@np.array([0,0,1,1])
 
+    
 
-    print(xyz0)
     ax.plot([xyz0[0],x1[0]], [xyz0[1],x1[1]],[xyz0[2],x1[2]],color='#FF0000')
     ax.plot([xyz0[0],y1[0]], [xyz0[1],y1[1]],[xyz0[2],y1[2]], color='#11ff33')
     ax.plot([xyz0[0],z1[0]], [xyz0[1],z1[1]],[xyz0[2],z1[2]], color='#3366ff')
@@ -102,20 +102,25 @@ def show_point_cloud(X,T,ax,scale,xlim, ylim, zlim):
     """
     Creates a mouse-controllable 3D plot of the input points.
     """
-    T=np.eye(4)
     #draw_frame(T,scale,ax)
 
 
-
+    
 
     # This could be changed to use scatter if you want to
     # provide a per-point color. Otherwise, the plot function
     # is much faster.
-    ax.plot(X[:,0], X[:,2], X[:,1], '.')
-
+    #ax.plot(X[:,0], X[:,2], X[:,1], '.')
+    ax.plot(X[:,0], X[:,1], X[:,2], '.')
+    """
     ax.set_xlim(xlim)
     ax.set_ylim(zlim)
     ax.set_zlim([ylim[1], ylim[0]])
+    """
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
+    ax.set_zlim([zlim[1], zlim[0]])
+    
     ax.set_xlabel('x')
     ax.set_zlabel('z')
     ax.set_ylabel('y')
