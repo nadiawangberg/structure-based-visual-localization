@@ -10,7 +10,8 @@ from motion_from_essential import *
 from essential_from_fundamental import *
 from camera_matrices import *
 
-matches = np.loadtxt('../data/matches.txt')
+matches = np.loadtxt('../data/matches_sift.txt')
+print(matches)
 uv1 = matches[:,:2]
 uv2 = matches[:,2:]
 n = len(matches)
@@ -35,7 +36,37 @@ n = len(uv1)
 X = np.array([linear_triangulation(uv1[i], uv2[i], P1, P2) \
     for i in range(n)])
 
+
+#print(X)
+#print(len(X))
+
+"""
+fig = plt.figure(1)
+ax = fig.add_subplot(111, projection='3d')
+
+for i in range(len(X)): 
+	plt.scatter(X[i][2], X[i][1], X[i][0], marker='o')
+	print(X[i][2])
+ax.set_xlabel('X Label')
+ax.set_ylabel('Y Label')
+ax.set_zlabel('Z Label')
+#ax.set_zlim3d(-0.01,0.01)
+"""
+
+#plt.show()
+
+#for i 
+#plt.scatter(x,y,z, 
+
+
+# show_point_cloud(X,
+#     xlim=[-0.6,+0.6],
+#     ylim=[-0.6,+0.6],
+#     zlim=[+3.0,+4.2])
+
+
+
 show_point_cloud(X,
-    xlim=[-0.6,+0.6],
-    ylim=[-0.6,+0.6],
-    zlim=[+3.0,+4.2])
+    xlim=[-0.15,+0.05],
+    ylim=[-0.15,+0.1],
+    zlim=[0.7,+1.2])
