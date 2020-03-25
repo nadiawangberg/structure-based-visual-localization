@@ -117,10 +117,11 @@ def show_point_cloud(X,T,ax,scale,xlim, ylim, zlim):
     ax.set_ylim(zlim)
     ax.set_zlim([ylim[1], ylim[0]])
     """
+    
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
     ax.set_zlim([zlim[1], zlim[0]])
-    
+
     ax.set_xlabel('x')
     ax.set_zlabel('z')
     ax.set_ylabel('y')
