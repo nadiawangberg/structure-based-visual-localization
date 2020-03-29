@@ -11,7 +11,7 @@ from motion_from_essential import *
 from essential_from_fundamental import *
 from camera_matrices import *
 from numpy.linalg import inv
-matches = np.loadtxt('../data/matches.txt')
+matches = np.loadtxt('../data/matches_sift.txt')
 uv1 = matches[:,:2]
 uv2 = matches[:,2:]
 n = len(matches)
@@ -22,7 +22,13 @@ I2 = plt.imread('../data/im2.png')
 K1 = np.loadtxt('../data/K1.txt')
 K2 = np.loadtxt('../data/K2.txt')
 
-F = eight_point(uv1, uv2)
+#F = eight_point(uv1, uv2)
+uv1 = np.int32(uv1)
+uv2 = np.int32(uv2)
+
+F, mask = cv2.findFundamentalMat(uv1,uv2,cv2.FM_RANSAC, ransacReprojThreshold=0.05, confidence=0.99999)
+uv1 = uv1[mask.ravel()==1]
+uv2 = uv2[mask.ravel()==1]
 
 E = essential_from_fundamental(F, K1, K2)
 Rts = motion_from_essential(E)
@@ -67,8 +73,8 @@ print(T2)
 plt.figure(figsize=(6,6))
 ax = plt.axes(projection='3d')
 draw_frame(T1,1,ax)
-draw_frame(T2@T1,1,ax)
-draw_frame(np.eye(4),1,ax)
+#draw_frame(T2@T1,1,ax)
+draw_frame(T2,1,ax)
 show_point_cloud(X,T1,ax,1,
     xlim=[-0.6,+1], 
     ylim=[-0.6,+1],

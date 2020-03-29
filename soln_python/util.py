@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+from numpy.linalg import inv
 def draw_line(l, **args):
     """
     Draws the line satisfies the line equation
@@ -87,6 +87,7 @@ def draw_frame( T, scale,ax):
     y1=T@np.array([-1,0,0,1])
     z1=T@np.array([0,0,-1,1])
     """
+    T=inv(T)
     xyz0=T@np.array([0,0,0,1])
     x1=T@np.array([1,0,0,1])
     y1=T@np.array([0,1,0,1])

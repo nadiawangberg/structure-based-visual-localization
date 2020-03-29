@@ -41,7 +41,7 @@ matchesMask = [[0,0] for i in range(len(matches))]
 
 #Ratio test (SIFT)
 for i,(m,n) in enumerate(matches):
-    if m.distance < 0.5*n.distance:
+    if m.distance < 0.35*n.distance:
         matchesMask[i]=[1,0]
         matches_filterd.append([kp1[i].pt[0], kp1[i].pt[1], kp2[i].pt[0], kp2[i].pt[1]])
 
