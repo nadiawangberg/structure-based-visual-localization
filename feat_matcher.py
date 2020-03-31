@@ -34,7 +34,7 @@ flann = cv.FlannBasedMatcher(index_params,search_params)
 
 #SIFT
 matches = flann.knnMatch(des1,des2,k=2)
-matches_filterd = []
+#matches_filterd = []
 pts1 = []
 pts2 = []
 
@@ -42,14 +42,14 @@ pts2 = []
 matchesMask = [[0,0] for i in range(len(matches))]
 
 #Ratio test (SIFT)
+good = []
 for i,(m,n) in enumerate(matches):
-    if m.distance < 0.6*n.distance:
+    if m.distance < 0.75*n.distance:
         matchesMask[i]=[1,0]
-        matches_filterd.append([kp1[i].pt[0], kp1[i].pt[1], kp2[i].pt[0], kp2[i].pt[1]])
-        pts1.append([kp1[i].pt[0], kp1[i].pt[1]])
-        pts2.append([kp2[i].pt[0], kp2[i].pt[1]])
+        pts1.append([kp1[n.queryIdx].pt[0], kp1[n.queryIdx].pt[1]])
+        pts2.append([kp2[m.trainIdx].pt[0], kp2[m.trainIdx].pt[1]])
+        good.append([m])
 
-matches_filterd = np.int32(np.around(matches_filterd))
 
 """
 with open('matches_sift.txt', 'a') as f:
@@ -66,6 +66,10 @@ draw_params = dict(
 
 img_sift = cv.drawMatchesKnn(gray1,kp1,gray2,kp2,matches,None,**draw_params)
 
+img_sift2 = cv.drawMatchesKnn(gray1,kp1,gray2,kp2,good, None, flags=2)
+plt.figure(4)
+plt.imshow(img_sift2)
+
 plt.figure(1)
 plt.imshow(img_sift)
 
@@ -74,34 +78,33 @@ plt.imshow(img_sift)
 pts1 = np.int32(np.around(pts1))
 pts2 = np.int32(np.around(pts2))
 
-F, mask = cv.findFundamentalMat(pts1,pts2,cv.FM_RANSAC, ransacReprojThreshold=0.05, confidence=0.99999)
+F, mask = cv.findFundamentalMat(pts1,pts2,cv.FM_RANSAC, ransacReprojThreshold=0.3, confidence=0.7) # 0.05, 0.99999
 
 # Select inlier points
 pts1 = pts1[mask.ravel()==1]
 pts2 = pts2[mask.ravel()==1]
 
-np.savetxt('matchesSIFT.txt', np.hstack((pts1,pts2)))
-
-
-#DEBUGGING
-plt.figure(2)
-plt.plot(pts1[:,0].T, pts1[:,1].T, 'ro')
-
-#numbers in plot
-for p in range(len(pts1)):
-	plt.text(pts1[p][0], pts1[p][1], str(p+1), color="black", fontsize=10)
-
-plt.imshow(gray1)
+np.savetxt('data/matchesSIFT.txt', np.hstack((pts1,pts2)))
 
 
 plt.figure(3)
-plt.plot(pts2[:,0].T, pts2[:,1].T, 'bo')
+plt.plot(pts2[:,0], pts2[:,1], 'bo')
 
 #numbers in plot
 for p in range(len(pts2)):
 	plt.text(pts2[p][0], pts2[p][1], str(p+1), color="black", fontsize=10)
 
 plt.imshow(gray2)
+
+#DEBUGGING
+plt.figure(2)
+plt.plot(pts1[:,0], pts1[:,1], 'ro')
+
+#numbers in plot
+for p in range(len(pts1)):
+	plt.text(pts1[p][0], pts1[p][1], str(p+1), color="black", fontsize=10)
+
+plt.imshow(gray1)
 
 print("MATCHED POINT TWO")
 print(pts1[1])
