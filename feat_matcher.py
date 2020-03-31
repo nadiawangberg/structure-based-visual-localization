@@ -8,7 +8,7 @@ gray1= cv.cvtColor(img1,cv.COLOR_BGR2GRAY)
 gray2= cv.cvtColor(img2,cv.COLOR_BGR2GRAY)
 
 #Detectors
-sift = cv.xfeatures2d.SIFT_create(0,3,0.04, 10,1.4)
+sift = cv.xfeatures2d.SIFT_create()#(0,3,0.04, 10,1.4)
 orb = cv.ORB_create()
 
 #should change params
@@ -35,6 +35,8 @@ flann = cv.FlannBasedMatcher(index_params,search_params)
 #SIFT
 matches = flann.knnMatch(des1,des2,k=2)
 matches_filterd = []
+pts1 = []
+pts2 = []
 
 #Try to only use good matches
 matchesMask = [[0,0] for i in range(len(matches))]
@@ -44,18 +46,20 @@ for i,(m,n) in enumerate(matches):
     if m.distance < 0.6*n.distance:
         matchesMask[i]=[1,0]
         matches_filterd.append([kp1[i].pt[0], kp1[i].pt[1], kp2[i].pt[0], kp2[i].pt[1]])
+        pts1.append([kp1[i].pt[0], kp1[i].pt[1]])
+        pts2.append([kp2[i].pt[0], kp2[i].pt[1]])
 
+matches_filterd = np.int32(np.around(matches_filterd))
 
-
+"""
 with open('matches_sift.txt', 'a') as f:
     for match in matches_filterd:
         for coordinate in match:
-            f.write("%s " % coordinate) #write each number
+            f.write("%s " % coordinate) #write matcheseach number
         f.write("\n") #end with newline
+"""
 
-
-
-draw_params = dict(matchColor = (0,255,0),
+draw_params = dict(
                    singlePointColor = (255,0,0),
                    matchesMask = matchesMask,
                    flags = cv.DrawMatchesFlags_DEFAULT)
@@ -63,11 +67,50 @@ draw_params = dict(matchColor = (0,255,0),
 img_sift = cv.drawMatchesKnn(gray1,kp1,gray2,kp2,matches,None,**draw_params)
 
 plt.figure(1)
-#plt.subplot(211)
 plt.imshow(img_sift)
-#plt.imshow(img_sift),plt.show()
 
-plt.show()
+
+# Remove points that are not fulfilling epipolar constraint
+pts1 = np.int32(np.around(pts1))
+pts2 = np.int32(np.around(pts2))
+
+F, mask = cv.findFundamentalMat(pts1,pts2,cv.FM_RANSAC, ransacReprojThreshold=0.05, confidence=0.99999)
+
+# Select inlier points
+pts1 = pts1[mask.ravel()==1]
+pts2 = pts2[mask.ravel()==1]
+
+np.savetxt('matchesSIFT.txt', np.hstack((pts1,pts2)))
+
+
+#DEBUGGING
+plt.figure(2)
+plt.plot(pts1[:,0].T, pts1[:,1].T, 'ro')
+
+#numbers in plot
+for p in range(len(pts1)):
+	plt.text(pts1[p][0], pts1[p][1], str(p+1), color="black", fontsize=10)
+
+plt.imshow(gray1)
+
+
+plt.figure(3)
+plt.plot(pts2[:,0].T, pts2[:,1].T, 'bo')
+
+#numbers in plot
+for p in range(len(pts2)):
+	plt.text(pts2[p][0], pts2[p][1], str(p+1), color="black", fontsize=10)
+
+plt.imshow(gray2)
+
+print("MATCHED POINT TWO")
+print(pts1[1])
+print(pts2[1])
+
+plt.show(block=False)
+plt.pause(0.001) # Pause for interval seconds.
+input("hit[enter] to end.")
+plt.close('all')
 
 """
 #FLANN - ORB

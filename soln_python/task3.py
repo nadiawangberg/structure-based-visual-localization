@@ -10,7 +10,7 @@ from motion_from_essential import *
 from essential_from_fundamental import *
 from camera_matrices import *
 
-matches = np.loadtxt('../data/matches_sift.txt')
+matches = np.loadtxt('../data/matchesSIFT.txt')
 print(matches)
 uv1 = matches[:,:2]
 uv2 = matches[:,2:]
@@ -58,15 +58,17 @@ ax.set_zlabel('Z Label')
 #for i 
 #plt.scatter(x,y,z, 
 
-
-# show_point_cloud(X,
-#     xlim=[-0.6,+0.6],
-#     ylim=[-0.6,+0.6],
-#     zlim=[+3.0,+4.2])
-
-
-
+"""
 show_point_cloud(X,
-    xlim=[-0.15,+0.05],
-    ylim=[-0.15,+0.1],
-    zlim=[0.7,+1.2])
+    xlim=[-0.6,+0.6],
+    ylim=[-0.6,+0.6],
+    zlim=[+3.0,+4.2])
+"""
+
+plt.figure(figsize=(6,6))
+ax=plt.axes(projection='3d')
+
+show_point_cloud(X,np.eye(4),ax,1,
+    xlim=[-0.6,+0.6],
+    ylim=[-0.6,+0.6],
+    zlim=[+3.0,+4.2])
