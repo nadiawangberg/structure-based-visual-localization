@@ -68,7 +68,17 @@ show_point_cloud(X,
 plt.figure(figsize=(6,6))
 ax=plt.axes(projection='3d')
 
+
+# for luddes x,y,z config
+"""
 show_point_cloud(X,np.eye(4),ax,1,
     xlim=[-0.6,+0.6],
     ylim=[-0.6,+0.6],
     zlim=[+3.0,+4.2])
+"""
+
+# for old skool x,y,z config
+show_point_cloud(X,np.eye(4),ax,1,
+    xlim=[-0.6,+0.6],
+    zlim=[-0.6,+0.6],
+    ylim=[+3.0,+4.2])

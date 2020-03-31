@@ -11,7 +11,7 @@ from motion_from_essential import *
 from essential_from_fundamental import *
 from camera_matrices import *
 from numpy.linalg import inv
-matches = np.loadtxt('../data/matches.txt')
+matches = np.loadtxt('../data/matchesSIFT.txt')
 uv1 = matches[:,:2]
 uv2 = matches[:,2:]
 n = len(matches)
@@ -70,8 +70,14 @@ draw_frame(T1,1,ax)
 
 draw_frame(T2@T1,1,ax)
 
+"""
 show_point_cloud(X,T1,ax,1,
     xlim=[-0.6,+1], 
     ylim=[-0.6,+1],
     zlim=[-0.6,+5])
+"""
 
+show_point_cloud(X,T1,ax,1,
+    xlim=[-1.6,+0.6],
+    zlim=[-1.6,+0.6],
+    ylim=[+2.0,+4.2])
