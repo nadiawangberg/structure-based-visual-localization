@@ -15,13 +15,18 @@ matches = np.loadtxt('../data/matchesSIFT.txt')
 uv1 = matches[:,:2]
 uv2 = matches[:,2:]
 n = len(matches)
-
+print(uv1)
 I1 = plt.imread('../data/im1.png')
 I2 = plt.imread('../data/im2.png')
 K1 = np.loadtxt('../data/K1.txt')
 K2 = np.loadtxt('../data/K2.txt')
 
+colors=np.zeros((len(uv1),3))
+uv1_int=np.array(uv1,dtype=int)
+for i in range(len(uv1_int)):
+    colors[i]=I1[uv1_int[i,1],uv1_int[i,0]]
 F = eight_point(uv1, uv2)
+
 
 E = essential_from_fundamental(F, K1, K2)
 Rts = motion_from_essential(E)
@@ -82,7 +87,7 @@ show_point_cloud(X,T1,ax,1,
     zlim=[-0.6,+5])
 """
 
-show_point_cloud(X,T1,ax,1,
+show_point_cloud(X,T1,ax,1,colors,
     xlim=[-1.6,+0.6],
     zlim=[-1.6,+0.6],
     ylim=[+2.0,+4.2])
