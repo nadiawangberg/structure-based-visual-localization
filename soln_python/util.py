@@ -99,7 +99,7 @@ def draw_frame( T, scale,ax,K):
     ax.plot([xyz0[0],y1[0]], [xyz0[1],y1[1]],[xyz0[2],y1[2]], color='#11ff33')
     ax.plot([xyz0[0],z1[0]], [xyz0[1],z1[1]],[xyz0[2],z1[2]], color='#3366ff')
         
-def show_point_cloud(X,T,ax,scale,xlim, ylim, zlim):
+def show_point_cloud(X,T,ax,scale,colors,xlim, ylim, zlim):
     """
     Creates a mouse-controllable 3D plot of the input points.
     """
@@ -111,7 +111,9 @@ def show_point_cloud(X,T,ax,scale,xlim, ylim, zlim):
     # This could be changed to use scatter if you want to
     # provide a per-point color. Otherwise, the plot function
     # is much faster.
-    ax.plot(X[:,0], X[:,2], X[:,1], '.')
+    for i in range(len(colors)):
+        ax.scatter(X[i,0], X[i,2], X[i,1], '.',c=colors[i])
+    #ax.plot(X[:,0], X[:,2], X[:,1], '.',c=[230,123,233])
     #ax.plot(X[:,0], X[:,1], X[:,2], '.')
     """
     ax.set_xlim(xlim)
