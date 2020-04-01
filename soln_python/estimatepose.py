@@ -71,9 +71,9 @@ T2=findT(X,uv2,K1)
 
 plt.figure(figsize=(6,6))
 ax = plt.axes(projection='3d')
-draw_frame(T1,1,ax)
+draw_frame(T1,1,ax,K1)
 
-draw_frame(T2@T1,1,ax)
+draw_frame(T2@T1,1,ax,K1)
 
 """
 show_point_cloud(X,T1,ax,1,

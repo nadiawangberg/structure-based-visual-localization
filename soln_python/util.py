@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from numpy.linalg import inv
 
 def draw_line(l, **args):
     """
@@ -63,23 +64,22 @@ def show_point_matches(I1, I2, uv1, uv2, F=None):
             l = F@np.array((u1,v1,1))
             draw_line(l, linewidth='1', color=colors[i])
     plt.tight_layout()
-def draw_frame( T, scale,ax):
+
+def draw_frame( T, scale,ax,K):
     """
     K: 3x3 Camera intrinsic matrix
     T: 4x4 Homogeneous transformation (object to camera coordinates)
     scale: Length of drawn axes
     """
     """
-    uv0 = project(K, T@np.array([0,0,0))
+    uv0 = project(K, T@np.array([0,0,0,1]))
     uvx = project(K, T@np.array([scale,0,0,1]))
     uvy = project(K, T@np.array([0,scale,0,1]))
     uvz = project(K, T@np.array([0,0,scale,1]))
 
-"""
-    """
-    plt.plot([uv0[0], uvx[0]], [uv0[1], uvx[1]], color='#cc4422')
-    plt.plot([uv0[0], uvy[0]], [uv0[1], uvy[1]], color='#11ff33')
-    plt.plot([uv0[0], uvz[0]], [uv0[1], uvz[1]], color='#3366ff')
+    ax.plot([uv0[0], uvx[0]], [uv0[1], uvx[1]], color='#cc4422')
+    ax.plot([uv0[0], uvy[0]], [uv0[1], uvy[1]], color='#11ff33')
+    ax.plot([uv0[0], uvz[0]], [uv0[1], uvz[1]], color='#3366ff')
     """
     """
     xyz0=T@np.array([0,0,0,1])
@@ -93,12 +93,12 @@ def draw_frame( T, scale,ax):
     z1=T@np.array([0,scale,0,1]) # see show_point_cloud
     y1=T@np.array([0,0,scale,1])
 
-    
+
 
     ax.plot([xyz0[0],x1[0]], [xyz0[1],x1[1]],[xyz0[2],x1[2]],color='#FF0000')
     ax.plot([xyz0[0],y1[0]], [xyz0[1],y1[1]],[xyz0[2],y1[2]], color='#11ff33')
     ax.plot([xyz0[0],z1[0]], [xyz0[1],z1[1]],[xyz0[2],z1[2]], color='#3366ff')
-    
+        
 def show_point_cloud(X,T,ax,scale,xlim, ylim, zlim):
     """
     Creates a mouse-controllable 3D plot of the input points.
@@ -117,6 +117,7 @@ def show_point_cloud(X,T,ax,scale,xlim, ylim, zlim):
     ax.set_xlim(xlim)
     ax.set_ylim(zlim)
     ax.set_zlim([ylim[1], ylim[0]])
+    
     """
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
