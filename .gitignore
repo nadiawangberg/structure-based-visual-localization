@@ -4,3 +4,5 @@
 data/matchesORB.txt
 
 data/matchesSIFT.txt
+
+*.txt

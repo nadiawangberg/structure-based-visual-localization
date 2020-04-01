@@ -11,7 +11,7 @@ from motion_from_essential import *
 from essential_from_fundamental import *
 from camera_matrices import *
 from numpy.linalg import inv
-matches = np.loadtxt('../data/matchesORB.txt')
+matches = np.loadtxt('../data/matchesSIFT1.txt')
 uv1 = matches[:,:2]
 uv2 = matches[:,2:]
 n = len(matches)
@@ -66,13 +66,16 @@ def findT(X,uv,K): #find transform
 
     return T_v@T_r #Entire transformation
 
+T0 = np.array([[1, 0, 0, 0], 
+    [0, 1, 0, 0],
+    [0, 0, 1, 0],
+    [0, 0, 0, 1]])
 T1=findT(X,uv1,K1)
 T2=findT(X,uv2,K1)
 
 plt.figure(figsize=(6,6))
 ax = plt.axes(projection='3d')
-draw_frame(T1,1,ax)
-
+draw_frame(T1@T0,1,ax)
 draw_frame(T2@T1,1,ax)
 
 """

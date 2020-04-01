@@ -3,32 +3,15 @@ import numpy as np
 from matplotlib import pyplot as plt
 import sys
 
-img1 = cv.imread('../Photos/1.jpg')
-img2 = cv.imread('../Photos/2.jpg')
-gray1= cv.cvtColor(img1,cv.COLOR_BGR2GRAY)
-gray2= cv.cvtColor(img2,cv.COLOR_BGR2GRAY)
-
-#Default
-use_sift = True
-use_orb = not use_sift
-
-if (len(sys.argv) > 1):
-	if (sys.argv[1] == "orb"):
-		use_orb = True
-		use_sift = False
-else:
-	print("Set command argument to change detector")
-
-
-def detect(use_sift, use_orb):
+def detect(gray1, gray2, use_sift, use_orb, detect_num):
 	#Detectors
 	if use_sift:
-		print("feature detection (SIFT) ")
+		print("feature detection (SIFT)")
 
 		#TUNE PARAMSd
 		ransacRepThresh = 0.99999
 		conf = 0.05
-		alpha = 0.5 #TUNE
+		alpha = 0.4 #TUNE
 
 		#Sift object
 		sift = cv.xfeatures2d.SIFT_create(contrastThreshold = 0.07, sigma = 2.4)#(3,0.04, 10,1.4)
@@ -41,12 +24,12 @@ def detect(use_sift, use_orb):
 		FLANN_INDEX_KDTREE = 1
 		index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
 	elif use_orb:
-		print("feature detection (ORB) ")
+		print("feature detection (ORB)")
 		
 		#TUNE PARAMSd
-		ransacRepThresh = 0.99
+		ransacRepThresh = 0.99999
 		conf = 0.05
-		alpha = 0.7 #TUNE
+		alpha = 0.5 #TUNE
 		orb = cv.ORB_create()
 
 		#orb for img1
@@ -62,7 +45,7 @@ def detect(use_sift, use_orb):
 		index_params= dict(algorithm = FLANN_INDEX_LSH,
 						   table_number = 6, # 12
 						   key_size = 12,     # 20
-						   multi_probe_level = 1) #2search_params = dict(checks=50)   # or pass empty dictionary
+						   multi_probe_level = 1)
 
 
 	# FLANN feature matching
@@ -109,17 +92,41 @@ def detect(use_sift, use_orb):
 
 	print("writing to file")
 	if use_orb:
-		np.savetxt('data/matchesORB.txt', np.hstack((pts1,pts2)))
+		np.savetxt('data/matchesORB'+detect_num+'.txt', np.hstack((pts1,pts2)))
 	elif use_sift:
-		np.savetxt('data/matchesSIFT.txt', np.hstack((pts1,pts2)))
+		np.savetxt('data/matchesSIFT'+detect_num+'.txt', np.hstack((pts1,pts2)))
 
 	return pts1, pts2
 
 
+#INITIALIZIATION
+img1 = cv.imread('../Photos/1.jpg')
+img2 = cv.imread('../Photos/2.jpg')
+gray1= cv.cvtColor(img1,cv.COLOR_BGR2GRAY)
+gray2= cv.cvtColor(img2,cv.COLOR_BGR2GRAY)
 
-pts1, pts2 = detect(use_sift, use_orb)
-####   Visualizing points after fulfulling epipolar constraints
+#Default
+use_sift = True
+use_orb = not use_sift
 
+if (len(sys.argv) > 1):
+	if (sys.argv[1] == "orb"):
+		use_orb = True
+		use_sift = False
+else:
+	print("Set command argument to change detector")
+
+
+for i in range(1,5): #will do 6 detections
+	img1 = cv.imread('../Photos/'+ str(i) + '.jpg')
+	img2 = cv.imread('../Photos/'+ str(i+1) + '.jpg')
+	gray1= cv.cvtColor(img1,cv.COLOR_BGR2GRAY)
+	gray2= cv.cvtColor(img2,cv.COLOR_BGR2GRAY)
+
+	print("DETECT+MATCH FOR IMAGE: ", i)
+	pts1, pts2 = detect(gray1, gray2, use_sift, use_orb, str(i))
+
+####   Visualizing
 print("plotting figures")
 #IMAGE 1
 plt.figure(2)
@@ -136,9 +143,8 @@ plt.plot(pts2[:,0], pts2[:,1], 'bo')
 for p in range(len(pts2)):
 	plt.text(pts2[p][0], pts2[p][1], str(p+1), color="black", fontsize=10)
 plt.imshow(gray2, cmap='gray')
-
-
 plt.show()
+
 plt.pause(0.001)
 input("hit something to end")
 plt.close('all')
