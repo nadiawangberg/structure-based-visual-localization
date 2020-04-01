@@ -42,24 +42,29 @@ X=np.array(X,dtype='float32')
 uv2=np.array(uv2,dtype='float32')
 
 
-def findT(X,uv,K):
+def findT(X,uv,K): #find transform
     uv=np.array(uv,dtype='float32')
     dist_coeffs = np.zeros((4,1))
     #(success, rotation_vector, translation_vector) = cv2.solvePnP(X, uv2, K2, dist_coeffs,flags=0)
     (success,rotation_vector, translation_vector,_) = cv2.solvePnPRansac(X, uv, K2, dist_coeffs,cv2.SOLVEPNP_UPNP)
-    T_r,_=cv2.Rodrigues(rotation_vector)
+    temp_rotation_vector = np.array([rotation_vector[0], rotation_vector[2], rotation_vector[1]]) #change y,z
+    T_r,_=cv2.Rodrigues(temp_rotation_vector) #rotation
 
+    #Translation
     x=translation_vector[0]
     y=translation_vector[1]
     z=translation_vector[2]
 
-    T_v=np.array([[1,0,0,x],[0,1,0,y],[0,0,1,z],[0,0,0,1]])
+    #Translation in an array
+    T_v=np.array([[1,0,0,-x],[0,1,0,y],[0,0,1,-z],[0,0,0,1]])
 
+    #Rotation in an array
     T_r=np.array([[T_r[0,0],T_r[0,1],T_r[0,2],0],[T_r[1,0],T_r[1,1],T_r[1,2],0],[T_r[2,0],T_r[2,1],T_r[2,2],0],[0,0,0,1]])
+    
     T_v=T_v.astype(float)
     T_r=T_r.astype(float)
 
-    return T_v@T_r
+    return T_v@T_r #Entire transformation
 
 T1=findT(X,uv1,K1)
 T2=findT(X,uv2,K1)

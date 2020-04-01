@@ -12,7 +12,6 @@ gray2= cv.cvtColor(img2,cv.COLOR_BGR2GRAY)
 use_sift = True
 use_orb = not use_sift
 
-print(len(sys.argv))
 if (len(sys.argv) > 1):
 	if (sys.argv[1] == "orb"):
 		use_orb = True

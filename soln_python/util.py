@@ -87,10 +87,11 @@ def draw_frame( T, scale,ax):
     y1=T@np.array([-1,0,0,1])
     z1=T@np.array([0,0,-1,1])
     """
+    scale = 0.5
     xyz0=T@np.array([0,0,0,1])
-    x1=T@np.array([1,0,0,1])
-    y1=T@np.array([0,1,0,1])
-    z1=T@np.array([0,0,1,1])
+    x1=T@np.array([scale,0,0,1])
+    z1=T@np.array([0,scale,0,1]) # see show_point_cloud
+    y1=T@np.array([0,0,scale,1])
 
     
 
