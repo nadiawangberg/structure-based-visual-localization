@@ -11,15 +11,15 @@ from motion_from_essential import *
 from essential_from_fundamental import *
 from camera_matrices import *
 from numpy.linalg import inv
-matches = np.loadtxt('../data/matchesSIFT.txt')
+matches = np.loadtxt('../data/matchesORB.txt')
 uv1 = matches[:,:2]
 uv2 = matches[:,2:]
 n = len(matches)
 
-I1 = plt.imread('../data/im1.png')
-I2 = plt.imread('../data/im2.png')
-K1 = np.loadtxt('../data/K1.txt')
-K2 = np.loadtxt('../data/K2.txt')
+I1 = plt.imread('../data/1.jpg')
+I2 = plt.imread('../data/2.jpg')
+K1 = np.loadtxt('../data/K_p20.txt')
+K2 = K1
 
 F = eight_point(uv1, uv2)
 

@@ -1,2 +1,6 @@
 
 *.pyc
+
+data/matchesORB.txt
+
+data/matchesSIFT.txt
