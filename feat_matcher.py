@@ -11,7 +11,7 @@ def detect(gray1, gray2, use_sift, use_orb, detect_num):
 		#TUNE PARAMSd
 		ransacRepThresh = 0.99999
 		conf = 0.05
-		alpha = 0.4 #TUNE
+		alpha = 0.7 #TUNE
 
 		#Sift object
 		sift = cv.xfeatures2d.SIFT_create(contrastThreshold = 0.07, sigma = 2.4)#(3,0.04, 10,1.4)
@@ -100,10 +100,10 @@ def detect(gray1, gray2, use_sift, use_orb, detect_num):
 
 
 #INITIALIZIATION
-img1 = cv.imread('./Photos/1.jpg')
-img2 = cv.imread('./Photos/2.jpg')
-gray1= cv.cvtColor(img1,cv.COLOR_BGR2GRAY)
-gray2= cv.cvtColor(img2,cv.COLOR_BGR2GRAY)
+#img1 = cv.imread('./Photos/1.jpg')
+#img2 = cv.imread('./Photos/2.jpg')
+#gray1= cv.cvtColor(img1,cv.COLOR_BGR2GRAY)
+#gray2= cv.cvtColor(img2,cv.COLOR_BGR2GRAY)
 
 #Default
 use_sift = True
@@ -117,9 +117,10 @@ else:
 	print("Set command argument to change detector")
 
 
-for i in range(1,8): #will do 6 detections
+for i in range(1,9): #will do 6 detections
 	img1 = cv.imread('./Photos/'+ str(i) + '.jpg')
 	img2 = cv.imread('./Photos/'+ str(i+1) + '.jpg')
+	print('./Photos/'+ str(i+1) + '.jpg')
 	gray1= cv.cvtColor(img1,cv.COLOR_BGR2GRAY)
 	gray2= cv.cvtColor(img2,cv.COLOR_BGR2GRAY)
 

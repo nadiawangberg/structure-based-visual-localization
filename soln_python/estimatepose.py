@@ -40,7 +40,7 @@ def findT(match,pic1,pic2,K): #find transform
 
     #T=np.eye(4)
     X=np.array(X,dtype='float32')
-    uv2=np.array(uv2,dtype='float32')
+    #uv2=np.array(uv2,dtype='float32')
 
     uv=np.array(uv2,dtype='float32')
     dist_coeffs = np.zeros((4,1))
@@ -63,29 +63,35 @@ def findT(match,pic1,pic2,K): #find transform
     T_v=T_v.astype(float)
     T_r=T_r.astype(float)
 
-    return T_v@T_r,X #Entire transformation
+
+    T_1_to_2 = np.vstack( (np.column_stack((R,t)), np.array([0,0,0,1])) )
+    print(T_1_to_2)
+
+    return T_v@T_r , X, T_1_to_2
 
 
 K1 = np.loadtxt('../data/K_p20.txt')
 K2 = K1
 T0 = np.eye(4)
-T1=np.eye(4)
+T1=np.eye(4) #T:N_to_world
 plt.figure(figsize=(6,6))
 ax = plt.axes(projection='3d')
-draw_frame(T1,1,ax)
-for i in range(1,4):
-    [T2,X]=findT('../data/matchesSIFT'+str(i)+'.txt','../data/'+str(i)+'.jpg','../data/'+str(i+1)+'.jpg',K1)
+scale = 3
+draw_frame(T1,scale,ax)
+
+for i in range(1,8):
+    [T2,X, T]=findT('../data/matchesSIFT'+str(i)+'.txt','../data/'+str(i)+'.jpg','../data/'+str(i+1)+'.jpg',K1)
+    #T2 : T_N_to_N+1
     #T2=findT(X,uv2,K1)
 
     #draw_frame(T,scale,ax)
-
-    T_inv=inv(T1)
     X_t=np.zeros((len(X),4))
     for j in range(len(X)):
         x_hom=np.append(X[j],1)
-        X_t[j]=T_inv@x_hom.T
-    X=X_t
+        X_t[j]=T@x_hom
 
+    print(X_t[0])
+    print(X[0])
     """
     X_glob = []
     for point in X:
@@ -94,18 +100,14 @@ for i in range(1,4):
     """
 
     #draw_frame(T1@T0,1,ax)
-    draw_frame(T1@T2,1,ax)
-
-    print("HEEEEEEEEEEEEEEEEEY")
-    print("ey", i)
-    colors = ['r', 'g', 'b']
-    show_point_cloud(X,T1,ax,1,
+    colors = ['c', 'r', 'g', 'b', 'y', 'm', 'k', '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+    show_point_cloud(X,ax,
         xlim=[-1.6,+0.6],
         zlim=[-1.6,+0.6],
         ylim=[+2.0,+4.2], color = colors[i-1])
         
-    T1=T1@T2
+    T1=T1@T
+    draw_frame(T1,scale,ax)
 
-
-print(X[0])
+#print(X[0])
 plt.show()
