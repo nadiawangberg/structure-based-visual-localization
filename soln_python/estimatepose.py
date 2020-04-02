@@ -28,7 +28,16 @@ def findT(match,pic1,pic2,K): #find transform
     Rts = motion_from_essential(E)
     R,t = choose_solution(uv1, uv2, K, K, Rts)
     P1,P2 = camera_matrices(K, K, R, t)
+    print(R)
+    print(t)
+    x=t[0]
+    y=t[1]
+    z=t[2]
+    trans_1_2=np.array([[1,0,0,-x],[0,1,0,y],[0,0,1,-z],[0,0,0,1]])
 
+    #Rotation in an array
+    rot_1_2=np.array([[R[0,0],R[0,1],R[0,2],0],[R[1,0],R[1,1],R[1,2],0],[R[2,0],R[2,1],R[2,2],0],[0,0,0,1]])
+    
     # Uncomment for task 4b
     # uv1 = np.loadtxt('../data/goodPoints.txt')
     # uv2 = epipolar_match(rgb2gray(I1), rgb2gray(I2), F, uv1)
@@ -63,7 +72,7 @@ def findT(match,pic1,pic2,K): #find transform
     T_v=T_v.astype(float)
     T_r=T_r.astype(float)
 
-    return T_v@T_r,X #Entire transformation
+    return T_v@T_r,X,trans_1_2@rot_1_2 #Entire transformation
 
 
 K1 = np.loadtxt('../data/K_p20.txt')
@@ -74,16 +83,16 @@ plt.figure(figsize=(6,6))
 ax = plt.axes(projection='3d')
 draw_frame(T1,1,ax,0)
 for i in range(1,4):
-    [T2,X]=findT('../data/matchesSIFT'+str(i)+'.txt','../data/'+str(i)+'.jpg','../data/'+str(i+1)+'.jpg',K1)
+    [T2,X,T_1_2]=findT('../data/matchesSIFT'+str(i)+'.txt','../data/'+str(i)+'.jpg','../data/'+str(i+1)+'.jpg',K1)
     #T2=findT(X,uv2,K1)
 
     #draw_frame(T,scale,ax)
 
-    T_inv=inv(T1)
+    T_inv=inv(T1)@T_1_2@(T2)
     X_t=np.zeros((len(X),4))
     for j in range(len(X)):
         x_hom=np.append(X[j],1)
-        X_t[j]=T_inv@x_hom.T
+        X_t[j]=T_inv@x_hom
     X=X_t
 
     """
