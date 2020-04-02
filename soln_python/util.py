@@ -111,8 +111,10 @@ def show_point_cloud(X,T,ax,scale,colors,xlim, ylim, zlim):
     # This could be changed to use scatter if you want to
     # provide a per-point color. Otherwise, the plot function
     # is much faster.
-    for i in range(len(colors)):
+    """for i in range(len(colors)):
         ax.scatter(X[i,0], X[i,2], X[i,1], '.',c=colors[i])
+    """
+    ax.scatter(X[:,0], X[:,2], X[:,1], '.',c=colors)
     #ax.plot(X[:,0], X[:,2], X[:,1], '.',c=[230,123,233])
     #ax.plot(X[:,0], X[:,1], X[:,2], '.')
     """

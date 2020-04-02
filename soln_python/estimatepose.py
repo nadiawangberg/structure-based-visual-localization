@@ -15,16 +15,23 @@ matches = np.loadtxt('../data/matchesSIFT.txt')
 uv1 = matches[:,:2]
 uv2 = matches[:,2:]
 n = len(matches)
-print(uv1)
-I1 = plt.imread('../data/im1.png')
-I2 = plt.imread('../data/im2.png')
+
+#I1 = plt.imread('../data/im1.png')
+#I2 = plt.imread('../data/im2.png')
+I1 = plt.imread('../Photos/photo1.jpg')
+print(I1[0,0])
 K1 = np.loadtxt('../data/K1.txt')
 K2 = np.loadtxt('../data/K2.txt')
-
+K1=np.array([[2887.13,0,1799.84],
+						[0,2883.59,1366.89],
+						[0.0,0.0,1.0]])
+K2=K1
 colors=np.zeros((len(uv1),3))
 uv1_int=np.array(uv1,dtype=int)
 for i in range(len(uv1_int)):
-    colors[i]=I1[uv1_int[i,1],uv1_int[i,0]]
+    colors[i]=I1[uv1_int[i,1],uv1_int[i,0]]/255.0
+
+
 F = eight_point(uv1, uv2)
 
 
