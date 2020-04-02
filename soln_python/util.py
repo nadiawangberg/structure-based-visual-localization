@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+from numpy.linalg import inv
 def draw_line(l, **args):
     """
     Draws the line satisfies the line equation
@@ -99,19 +99,15 @@ def draw_frame( T, scale,ax):
     ax.plot([xyz0[0],y1[0]], [xyz0[1],y1[1]],[xyz0[2],y1[2]], color='#11ff33')
     ax.plot([xyz0[0],z1[0]], [xyz0[1],z1[1]],[xyz0[2],z1[2]], color='#3366ff')
     
-def show_point_cloud(X,T,ax,scale,xlim, ylim, zlim):
+def show_point_cloud(X,T,ax,scale,xlim, ylim, zlim, color):
     """
     Creates a mouse-controllable 3D plot of the input points.
     """
-    #draw_frame(T,scale,ax)
-
-
-    
 
     # This could be changed to use scatter if you want to
     # provide a per-point color. Otherwise, the plot function
     # is much faster.
-    ax.plot(X[:,0], X[:,2], X[:,1], '.')
+    ax.plot(X[:,0], X[:,2], X[:,1], '.', c=color)
     #ax.plot(X[:,0], X[:,1], X[:,2], '.')
     """
     ax.set_xlim(xlim)
@@ -125,7 +121,7 @@ def show_point_cloud(X,T,ax,scale,xlim, ylim, zlim):
     ax.set_xlabel('x')
     ax.set_zlabel('z')
     ax.set_ylabel('y')
-    plt.show()
+    
 def R_x(theta):
     theta=np.deg2rad(theta)
     R=np.identity(4)
