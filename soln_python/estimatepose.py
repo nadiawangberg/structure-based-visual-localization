@@ -72,7 +72,7 @@ T0 = np.eye(4)
 T1=np.eye(4)
 plt.figure(figsize=(6,6))
 ax = plt.axes(projection='3d')
-draw_frame(T1,1,ax)
+draw_frame(T1,1,ax,0)
 for i in range(1,4):
     [T2,X]=findT('../data/matchesSIFT'+str(i)+'.txt','../data/'+str(i)+'.jpg','../data/'+str(i+1)+'.jpg',K1)
     #T2=findT(X,uv2,K1)
@@ -94,7 +94,7 @@ for i in range(1,4):
     """
 
     #draw_frame(T1@T0,1,ax)
-    draw_frame(T1@T2,1,ax)
+    draw_frame(T1@T2,1,ax,i)
 
     print("HEEEEEEEEEEEEEEEEEY")
     print("ey", i)

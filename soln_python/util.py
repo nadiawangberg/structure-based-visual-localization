@@ -63,7 +63,7 @@ def show_point_matches(I1, I2, uv1, uv2, F=None):
             l = F@np.array((u1,v1,1))
             draw_line(l, linewidth='1', color=colors[i])
     plt.tight_layout()
-def draw_frame( T, scale,ax):
+def draw_frame( T, scale,ax,i):
     """
     K: 3x3 Camera intrinsic matrix
     T: 4x4 Homogeneous transformation (object to camera coordinates)
@@ -98,7 +98,7 @@ def draw_frame( T, scale,ax):
     ax.plot([xyz0[0],x1[0]], [xyz0[1],x1[1]],[xyz0[2],x1[2]],color='#FF0000')
     ax.plot([xyz0[0],y1[0]], [xyz0[1],y1[1]],[xyz0[2],y1[2]], color='#11ff33')
     ax.plot([xyz0[0],z1[0]], [xyz0[1],z1[1]],[xyz0[2],z1[2]], color='#3366ff')
-    
+    ax.text(xyz0[0],xyz0[1], xyz0[2], str(i), 'x')
 def show_point_cloud(X,T,ax,scale,xlim, ylim, zlim, color):
     """
     Creates a mouse-controllable 3D plot of the input points.
