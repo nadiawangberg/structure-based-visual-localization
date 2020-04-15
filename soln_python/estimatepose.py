@@ -11,47 +11,61 @@ from motion_from_essential import *
 from essential_from_fundamental import *
 from camera_matrices import *
 from numpy.linalg import inv
-matches = np.loadtxt('../data/matchesSIFT.txt')
-uv1 = matches[:,:2]
-uv2 = matches[:,2:]
-n = len(matches)
-print(uv1)
-I1 = plt.imread('../data/im1.png')
-I2 = plt.imread('../data/im2.png')
-K1 = np.loadtxt('../data/K1.txt')
-K2 = np.loadtxt('../data/K2.txt')
 
-colors=np.zeros((len(uv1),3))
-uv1_int=np.array(uv1,dtype=int)
-for i in range(len(uv1_int)):
-    colors[i]=I1[uv1_int[i,1],uv1_int[i,0]]
-F = eight_point(uv1, uv2)
+def homogiphy(X):
+    X_hom=np.zeros((len(X),4))
+    for i in range(len(X)):
+        x_hom=np.append(X[i],1)
+        X_hom[i]=x_hom    
+    return X_hom
+def dehomogiphy(X_hom):
+    X=np.zeros((len(X),3))
+    for i in range(len(X)):
+        x=X_hom[i,:3]
+        X[i]=x    
+    return X
 
 
-E = essential_from_fundamental(F, K1, K2)
-Rts = motion_from_essential(E)
-R,t = choose_solution(uv1, uv2, K1, K2, Rts)
-P1,P2 = camera_matrices(K1, K2, R, t)
+def findT(match,pic1,pic2,K,T_n_w): #find transform
+    matches = np.loadtxt(match)
+    uv1 = matches[:,:2]
+    uv2 = matches[:,2:]
+    n = len(matches)
 
-# Uncomment for task 4b
-# uv1 = np.loadtxt('../data/goodPoints.txt')
-# uv2 = epipolar_match(rgb2gray(I1), rgb2gray(I2), F, uv1)
+    I1 = plt.imread(pic1)
+    I2 = plt.imread(pic2)
 
-n = len(uv1)
-X = np.array([linear_triangulation(uv1[i], uv2[i], P1, P2) \
-    for i in range(n)])
+    F = eight_point(uv1, uv2)
 
+    E = essential_from_fundamental(F, K, K)
+    Rts = motion_from_essential(E)
+    R,t = choose_solution(uv1, uv2, K, K, Rts)
+    P1,P2 = camera_matrices(K, K, R, t)
 
-#T=np.eye(4)
-X=np.array(X,dtype='float32')
-uv2=np.array(uv2,dtype='float32')
+    # Uncomment for task 4b
+    # uv1 = np.loadtxt('../data/goodPoints.txt')
+    # uv2 = epipolar_match(rgb2gray(I1), rgb2gray(I2), F, uv1)
 
+    n = len(uv1)
+    X_n = np.array([linear_triangulation(uv1[i], uv2[i], P1, P2) \
+        for i in range(n)])
 
-def findT(X,uv,K): #find transform
-    uv=np.array(uv,dtype='float32')
+    X_n_hom=homogiphy(X_n)
+    X_w_hom = np.copy(X_n_hom)
+    
+    for i in range(len(X_n_hom)):
+        X_w_hom[i]=T_n_w@X_n_hom[i]
+
+    #T=np.eye(4)
+    X_w=dehomogiphy(X_w_hom)
+    X_w=np.array(X_w,dtype='float32')
+
+    #uv2=np.array(uv2,dtype='float32')
+
+    uv2=np.array(uv2,dtype='float32')
     dist_coeffs = np.zeros((4,1))
     #(success, rotation_vector, translation_vector) = cv2.solvePnP(X, uv2, K2, dist_coeffs,flags=0)
-    (success,rotation_vector, translation_vector,_) = cv2.solvePnPRansac(X, uv, K2, dist_coeffs,cv2.SOLVEPNP_UPNP)
+    (success,rotation_vector, translation_vector,_) = cv2.solvePnPRansac(X_w, uv2, K, dist_coeffs,cv2.SOLVEPNP_UPNP)
     temp_rotation_vector = np.array([rotation_vector[0], rotation_vector[2], rotation_vector[1]]) #change y,z
     T_r,_=cv2.Rodrigues(temp_rotation_vector) #rotation
 
@@ -69,25 +83,66 @@ def findT(X,uv,K): #find transform
     T_v=T_v.astype(float)
     T_r=T_r.astype(float)
 
-    return T_v@T_r #Entire transformation
 
-T1=findT(X,uv1,K1)
-T2=findT(X,uv2,K1)
+    T_1_to_2 = np.vstack( (np.column_stack((R,t)), np.array([0,0,0,1])) )
+    print(T_1_to_2)
 
+    return T_v@T_r , X_w, T_1_to_2
+
+
+#K1 = np.loadtxt('../data/K_p20.txt')
+K1=np.loadtxt('../data/K1.txt')
+K2 = K1
+T0 = np.eye(4)
+T1=np.eye(4) #T:N_to_world
 plt.figure(figsize=(6,6))
 ax = plt.axes(projection='3d')
-draw_frame(T1,1,ax,K1)
-
-draw_frame(T2@T1,1,ax,K1)
-
+scale = 3
+draw_frame(T1,scale,ax)
+T1=np.eye(4)
 """
-show_point_cloud(X,T1,ax,1,
-    xlim=[-0.6,+1], 
-    ylim=[-0.6,+1],
-    zlim=[-0.6,+5])
-"""
+[T2,X, T]=findT('../data/matchesSIFT-1.txt','../data/im1.png','../data/im2.png',K1)
+colors = ['c', 'r', 'g', 'b', 'y', 'm', 'k', '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
 
-show_point_cloud(X,T1,ax,1,colors,
-    xlim=[-1.6,+0.6],
-    zlim=[-1.6,+0.6],
-    ylim=[+2.0,+4.2])
+show_point_cloud(X,ax,
+        xlim=[-1.6,+0.6],
+        zlim=[-1.6,+0.6],
+        ylim=[+2.0,+4.2], color = colors[0])    
+T1=T1@T
+draw_frame(T1,scale,ax)
+"""
+T_n_w=np.eye(4)
+for i in range(1,8):
+    [T_pnp,X_w, T_n_npp]=findT('../data/matchesSIFT'+str(i)+'.txt','../data/'+str(i)+'.jpg','../data/'+str(i+1)+'.jpg',K1,T_n_w)
+    T_n_w = T_n_w@inv(T_n_npp)
+    #T2 : T_N_to_N+1
+    #T2=findT(X,uv2,K1)
+
+    #draw_frame(T,scale,ax)
+    """
+    # X_t=np.zeros((len(X),4))
+    # for j in range(len(X)):
+    #     x_hom=np.append(X[j],1)
+    #     X_t[j]=T@x_hom
+    """
+    print(X_t[0])
+    print(X[0])
+    """
+    X_glob = []
+    for point in X:
+        point_glob = T2@T1@np.column_stack((point,1))
+        X_glob.append(point_glob)
+    """
+
+    #draw_frame(T1@T0,1,ax)
+    colors = ['c', 'r', 'g', 'b', 'y', 'm', 'k', '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+    show_point_cloud(X_w,ax,
+        xlim=[-1.6,+0.6],
+        zlim=[-1.6,+0.6],
+        ylim=[+2.0,+4.2], color = colors[i-1])
+        
+    T_pnp=T_pnp@T_n_w
+    draw_frame(T_pnp,scale,ax)
+"""
+#print(X[0])
+plt.show()
