@@ -22,12 +22,11 @@ def findT(match,pic1,pic2,K): #find transform
     I1 = plt.imread(pic1)
     I2 = plt.imread(pic2)
     colors=np.zeros((len(uv1),3))
-    print(uv1)
     uv1_int=np.array(uv1,dtype=int)
     print(len(I1))
     print(len(I1[0]))
     for i in range(len(uv1_int)):
-        colors[i]=I1[uv1_int[i,0],uv1_int[i,1]]/255.0
+        colors[i]=I1[uv1_int[i,1],uv1_int[i,0]]/255.0
 
 
     F = eight_point(uv1, uv2)
@@ -83,29 +82,33 @@ def findT(match,pic1,pic2,K): #find transform
     return T_v@T_r,X,trans_1_2@rot_1_2,colors #Entire transformation
 
 
-K1 = np.loadtxt('../data/K_p20.txt')
+#K1 = np.loadtxt('../data/K_p20.txt')
+K1 = np.loadtxt('../data/K1.txt')
 K2 = K1
 T0 = np.eye(4)
 T1=np.eye(4)
 plt.figure(figsize=(6,6))
 ax = plt.axes(projection='3d')
 draw_frame(T1,1,ax,0)
-[T2,X,T_1_2,colors]=findT('../data/matchesSIFT1.txt','../data/1.jpg','../data/2.jpg',K1)
+[T2,X,T_1_2,colors]=findT('../data/matchesSIFT1.txt','../data/im1.png','../data/im2.png',K1)
 show_point_cloud(X,T1,ax,1,colors,
         xlim=[-1.6,+0.6],
         zlim=[-1.6,+0.6],
         ylim=[+2.0,+4.2])
 T_c1_cn=np.eye(4)
-for i in range(1,4):
-    [T2,X,T_1_2,colors]=findT('../data/matchesSIFT'+str(i)+'.txt','../data/'+str(i)+'.jpg','../data/'+str(i+1)+'.jpg',K1)
-    T_c1_cn=T2@T_c1_cn 
-    draw_frame(T_c1_cn,1,ax,i)
+[T2,X,T_1_2,colors]=findT('../data/matchesSIFT'+str(1)+'.txt','../data/im1.png','../data/im2.png',K1)
+#     T_c1_cn=T2@T_c1_cn 
+#     draw_frame(T_c1_cn,1,ax,i)
+# for i in range(1,2):
+#     [T2,X,T_1_2,colors]=findT('../data/matchesSIFT'+str(i)+'.txt','../data/'+str(i)'.jpg','../data/'+str(i+1)+'.jpg',K1)
+#     T_c1_cn=T2@T_c1_cn 
+#     draw_frame(T_c1_cn,1,ax,i)
     #draw_frame(T1@T2,1,ax,i)
 
     #T2=findT(X,uv2,K1)
 
     #draw_frame(T,scale,ax)
-    """
+"""
     T_inv=inv(T1)@T_1_2@(T2)
     X_t=np.zeros((len(X),4))
     for j in range(len(X)):
@@ -118,16 +121,16 @@ for i in range(1,4):
     for point in X:
         point_glob = T2@T1@np.column_stack((point,1))
         X_glob.append(point_glob)
-    """
+"""
 
     #draw_frame(T1@T0,1,ax)
     #draw_frame(T1@T2,1,ax,i)
 
     #colors = ['r', 'g', 'b']
-    """show_point_cloud(X,T1,ax,1,
-        xlim=[-1.6,+0.6],
-        zlim=[-1.6,+0.6],
-        ylim=[+2.0,+4.2], color = colors[i-1])"""
+"""show_point_cloud(X,T1,ax,1,
+xlim=[-1.6,+0.6],
+zlim=[-1.6,+0.6],
+ylim=[+2.0,+4.2], color = colors[i-1])"""
         
     #T1=T1@T2
 

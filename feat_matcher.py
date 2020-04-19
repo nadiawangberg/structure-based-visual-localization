@@ -11,7 +11,7 @@ def detect(gray1, gray2, use_sift, use_orb, detect_num):
 		#TUNE PARAMSd
 		ransacRepThresh = 0.99999
 		conf = 0.05
-		alpha = 0.4 #TUNE
+		alpha = 0.6 #TUNE
 
 		#Sift object
 		sift = cv.xfeatures2d.SIFT_create(contrastThreshold = 0.07, sigma = 2.4)#(3,0.04, 10,1.4)
@@ -117,15 +117,20 @@ else:
 	print("Set command argument to change detector")
 
 
-for i in range(1,8): #will do 6 detections
-	img1 = cv.imread('./Photos/'+ str(i) + '.jpg')
-	img2 = cv.imread('./Photos/'+ str(i+1) + '.jpg')
-	gray1= cv.cvtColor(img1,cv.COLOR_BGR2GRAY)
-	gray2= cv.cvtColor(img2,cv.COLOR_BGR2GRAY)
+# for i in range(1,8): #will do 6 detections
+# 	img1 = cv.imread('./Photos/'+ str(i) + '.jpg')
+# 	img2 = cv.imread('./Photos/'+ str(i+1) + '.jpg')
+# 	gray1= cv.cvtColor(img1,cv.COLOR_BGR2GRAY)
+# 	gray2= cv.cvtColor(img2,cv.COLOR_BGR2GRAY)
 
-	print("DETECT+MATCH FOR IMAGE: ", i)
-	pts1, pts2 = detect(gray1, gray2, use_sift, use_orb, str(i))
+# 	print("DETECT+MATCH FOR IMAGE: ", i)
+# 	pts1, pts2 = detect(gray1, gray2, use_sift, use_orb, str(i))
 
+img1 = cv.imread('./data/im1.png')
+img2 = cv.imread('./data/im2.png')
+gray1= cv.cvtColor(img1,cv.COLOR_BGR2GRAY)
+gray2= cv.cvtColor(img2,cv.COLOR_BGR2GRAY)
+pts1, pts2 = detect(gray1, gray2, use_sift, use_orb, '1')
 ####   Visualizing
 print("plotting figures")
 #IMAGE 1
