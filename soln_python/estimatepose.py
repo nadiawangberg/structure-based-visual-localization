@@ -82,12 +82,22 @@ T1=np.eye(4)
 plt.figure(figsize=(6,6))
 ax = plt.axes(projection='3d')
 draw_frame(T1,1,ax,0)
+[T2,X,T_1_2]=findT('../data/matchesSIFT1.txt','../data/1.jpg','../data/2.jpg',K1)
+show_point_cloud(X,T1,ax,1,
+        xlim=[-1.6,+0.6],
+        zlim=[-1.6,+0.6],
+        ylim=[+2.0,+4.2],color='r')
+T_c1_cn=np.eye(4)
 for i in range(1,4):
     [T2,X,T_1_2]=findT('../data/matchesSIFT'+str(i)+'.txt','../data/'+str(i)+'.jpg','../data/'+str(i+1)+'.jpg',K1)
+    T_c1_cn=T2@T_c1_cn 
+    draw_frame(T_c1_cn,1,ax,i)
+    #draw_frame(T1@T2,1,ax,i)
+
     #T2=findT(X,uv2,K1)
 
     #draw_frame(T,scale,ax)
-
+    """
     T_inv=inv(T1)@T_1_2@(T2)
     X_t=np.zeros((len(X),4))
     for j in range(len(X)):
@@ -95,7 +105,7 @@ for i in range(1,4):
         X_t[j]=T_inv@x_hom
     X=X_t
 
-    """
+   
     X_glob = []
     for point in X:
         point_glob = T2@T1@np.column_stack((point,1))
@@ -103,18 +113,16 @@ for i in range(1,4):
     """
 
     #draw_frame(T1@T0,1,ax)
-    draw_frame(T1@T2,1,ax,i)
+    #draw_frame(T1@T2,1,ax,i)
 
-    print("HEEEEEEEEEEEEEEEEEY")
-    print("ey", i)
-    colors = ['r', 'g', 'b']
-    show_point_cloud(X,T1,ax,1,
+    #colors = ['r', 'g', 'b']
+    """show_point_cloud(X,T1,ax,1,
         xlim=[-1.6,+0.6],
         zlim=[-1.6,+0.6],
-        ylim=[+2.0,+4.2], color = colors[i-1])
+        ylim=[+2.0,+4.2], color = colors[i-1])"""
         
-    T1=T1@T2
+    #T1=T1@T2
 
 
-print(X[0])
+
 plt.show()
