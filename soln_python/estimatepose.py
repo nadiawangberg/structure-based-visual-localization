@@ -27,7 +27,7 @@ def findT(match,pic1,pic2,K): #find transform
     print(len(I1))
     print(len(I1[0]))
     for i in range(len(uv1_int)):
-        colors[i]=I1[uv1_int[i,0],uv1_int[i,1]]/255.0
+        colors[i]=I1[uv1_int[i,1],uv1_int[i,0]]/255.0
 
 
     F = eight_point(uv1, uv2)
@@ -65,7 +65,7 @@ def findT(match,pic1,pic2,K): #find transform
     (success,rotation_vector, translation_vector,_) = cv2.solvePnPRansac(X, uv, K, dist_coeffs,cv2.SOLVEPNP_UPNP)
     temp_rotation_vector = np.array([rotation_vector[0], rotation_vector[2], rotation_vector[1]]) #change y,z
     T_r,_=cv2.Rodrigues(temp_rotation_vector) #rotation
-
+    print("Success",success)
     #Translation
     x=translation_vector[0]
     y=translation_vector[1]
@@ -90,14 +90,14 @@ T1=np.eye(4)
 plt.figure(figsize=(6,6))
 ax = plt.axes(projection='3d')
 draw_frame(T1,1,ax,0)
-[T2,X,T_1_2,colors]=findT('../data/matchesSIFT1.txt','../data/1.jpg','../data/2.jpg',K1)
+[T2,X,T_1_2,colors]=findT('../data/matchesSIFT'+str(1)+'.txt','../Photos/glosh'+str(1)+'.jpg','../Photos/glosh'+str(1+1)+'.jpg',K1)
 show_point_cloud(X,T1,ax,1,colors,
         xlim=[-1.6,+0.6],
         zlim=[-1.6,+0.6],
         ylim=[+2.0,+4.2])
 T_c1_cn=np.eye(4)
-for i in range(1,4):
-    [T2,X,T_1_2,colors]=findT('../data/matchesSIFT'+str(i)+'.txt','../data/'+str(i)+'.jpg','../data/'+str(i+1)+'.jpg',K1)
+for i in range(1,2):
+    [T2,X,T_1_2,colors]=findT('../data/matchesSIFT'+str(i)+'.txt','../Photos/glosh'+str(i)+'.jpg','../Photos/glosh'+str(i+1)+'.jpg',K1)
     T_c1_cn=T2@T_c1_cn 
     draw_frame(T_c1_cn,1,ax,i)
     #draw_frame(T1@T2,1,ax,i)

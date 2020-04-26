@@ -100,8 +100,8 @@ def detect(gray1, gray2, use_sift, use_orb, detect_num):
 
 
 #INITIALIZIATION
-img1 = cv.imread('./Photos/1.jpg')
-img2 = cv.imread('./Photos/2.jpg')
+img1 = cv.imread('./Photos/glosh1.jpg')
+img2 = cv.imread('./Photos/glosh2.jpg')
 gray1= cv.cvtColor(img1,cv.COLOR_BGR2GRAY)
 gray2= cv.cvtColor(img2,cv.COLOR_BGR2GRAY)
 
@@ -117,15 +117,21 @@ else:
 	print("Set command argument to change detector")
 
 
-for i in range(1,8): #will do 6 detections
-	img1 = cv.imread('./Photos/'+ str(i) + '.jpg')
-	img2 = cv.imread('./Photos/'+ str(i+1) + '.jpg')
-	gray1= cv.cvtColor(img1,cv.COLOR_BGR2GRAY)
-	gray2= cv.cvtColor(img2,cv.COLOR_BGR2GRAY)
+# for i in range(1,8): #will do 6 detections
+# 	img1 = cv.imread('./Photos/'+ str(i) + '.jpg')
+# 	img2 = cv.imread('./Photos/'+ str(i+1) + '.jpg')
+# 	gray1= cv.cvtColor(img1,cv.COLOR_BGR2GRAY)
+# 	gray2= cv.cvtColor(img2,cv.COLOR_BGR2GRAY)
 
-	print("DETECT+MATCH FOR IMAGE: ", i)
-	pts1, pts2 = detect(gray1, gray2, use_sift, use_orb, str(i))
+# 	print("DETECT+MATCH FOR IMAGE: ", i)
+# 	pts1, pts2 = detect(gray1, gray2, use_sift, use_orb, str(i))
+img1 = cv.imread('./Photos/glosh1.jpg')
+img2 = cv.imread('./Photos/glosh2.jpg')
+gray1= cv.cvtColor(img1,cv.COLOR_BGR2GRAY)
+gray2= cv.cvtColor(img2,cv.COLOR_BGR2GRAY)
 
+print("DETECT+MATCH FOR IMAGE: ", 1)
+pts1, pts2 = detect(gray1, gray2, use_sift, use_orb,'1')
 ####   Visualizing
 print("plotting figures")
 #IMAGE 1
