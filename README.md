@@ -1,6 +1,6 @@
 # Structure-based visual localization
 
-Python implementation of Structure-based visual localization using a SIFT descriptor and matcher. A sparse 3D reconstruction, from monocular image data is initially created. 2D-3D matches are established from new query images. Finally, the camera pose is estimated using PnP inside a RANSAC loop. 
+Python implementation of Structure-based visual localization. Features were detected and matched using SIFT. Triangulation was used to create a sparse 3D reconstruction, as is visualized below. 2D-3D matches are established from new query images. Finally, the camera pose is estimated using PnP inside a RANSAC loop. 
 
 <img width="561" alt="3d_reconstruction" src="https://user-images.githubusercontent.com/29915643/129894652-b2557ff0-bdcc-46c8-8442-fc25e7097768.PNG">
 
