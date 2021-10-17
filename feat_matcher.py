@@ -2,31 +2,35 @@ import cv2 as cv
 import numpy as np
 from matplotlib import pyplot as plt
 import sys
+import yaml
+
+
 
 def detect_and_match(gray1, gray2, use_sift, use_orb, detect_num):
 	"""
-	Detects features using SIFT or ORB
-	Uses FLANN feature matcher
-	Filter out using Lowes ratio test
-	Filters out outliers using Ransac (from find fundamental matrix)
-
-
+	1) Detects features using SIFT or ORB
+	2) Uses FLANN feature matcher
+	3) Filter out using Lowes ratio test
+	4) Filters out outliers using Ransac (from find fundamental matrix)
 	"""
+
+	#Load parameters from param file
+	with open("params.yaml", "r") as stream:
+		try:
+			params = yaml.safe_load(stream)
+			print(params)
+		except yaml.YAMLError as exc:
+			print(exc)
 
 	#Detectors
 	if use_sift:
 		print("feature detection (SIFT)")
 
-		#Tunable parameters
-		ransacRepThresh = 0.99999
-		conf = 0.05
-		alpha = 0.3 # Lowes ratio test
-
 		#Sift object
-		sift = cv.xfeatures2d.SIFT_create(contrastThreshold = 0.07, sigma = 2.4)#(3,0.04, 10,1.4)
+		sift = cv.xfeatures2d.SIFT_create(contrastThreshold = params["sift"]["contrastThreshold"], sigma = params["sift"]["sigma"]) # 3,  0.04,  10,  1.4
 
 		#Detection - SIFT
-		kp1, des1 = sift.detectAndCompute(gray1,None) #Descriptor also computed
+		kp1, des1 = sift.detectAndCompute(gray1,None)
 		kp2, des2 = sift.detectAndCompute(gray2,None)
 
 		#Initialize FLANN for SIFT
@@ -35,10 +39,6 @@ def detect_and_match(gray1, gray2, use_sift, use_orb, detect_num):
 	elif use_orb:
 		print("feature detection (ORB)")
 		
-		#Tunable parameters
-		ransacRepThresh = 0.99999
-		conf = 0.05
-		alpha = 0.5 #Lowes ratio test
 		orb = cv.ORB_create()
 
 		#orb for img1
@@ -52,19 +52,17 @@ def detect_and_match(gray1, gray2, use_sift, use_orb, detect_num):
 		#Initialize FLANN for ORB
 		FLANN_INDEX_LSH = 6
 		index_params= dict(algorithm = FLANN_INDEX_LSH,
-						   table_number = 6, # 12
-						   key_size = 12,     # 20
+						   table_number = 6,
+						   key_size = 12,
 						   multi_probe_level = 1)
 
 
-	# FLANN feature matching
-	print("feature matching")
-	search_params = dict(checks=50)   # or pass empty dictionary
+	print("FLANN feature matching")
+	search_params = dict(checks=50)
 	flann = cv.FlannBasedMatcher(index_params,search_params)
 	matches = flann.knnMatch(des1,des2,k=2)
 
-	# Lowes ratio test - Only keep good matches (stored in pts1, pts2)
-	#Also called the 
+	#Nearest-neighbor distance ratio test (Lowes ratio test)
 	print("Lowes ratio test")
 	pts1 = []
 	pts2 = []
@@ -72,14 +70,13 @@ def detect_and_match(gray1, gray2, use_sift, use_orb, detect_num):
 	for i,tupl in enumerate(matches):
 		m = tupl[0]
 		n = tupl[1]
-		if m.distance < alpha*n.distance:
+		if m.distance < params["alpha"]*n.distance:
 			matchesMask[i]=[1,0]
 			pts1.append([kp1[n.queryIdx].pt[0], kp1[n.queryIdx].pt[1]])
 			pts2.append([kp2[m.trainIdx].pt[0], kp2[m.trainIdx].pt[1]])
 
 	# Visualize matching
-	draw_params = dict(#singlePointColor = (255,0,0),
-					   matchesMask = matchesMask,
+	draw_params = dict( matchesMask = matchesMask,
 					   flags = cv.DrawMatchesFlags_DEFAULT)
 
 	match_img = cv.drawMatchesKnn(gray1,kp1,gray2,kp2,matches,None,**draw_params)
@@ -87,14 +84,14 @@ def detect_and_match(gray1, gray2, use_sift, use_orb, detect_num):
 	plt.figure("All matches")
 	plt.imshow(match_img)
 
-	# Remove points that are not fulfilling epipolar constraint
+	#Remove points that are not fulfilling epipolar constraint
 	print("Filtering on fundamental matrix with ransac")
 	pts1 = np.int32(np.around(pts1))
 	pts2 = np.int32(np.around(pts2))
+	_, mask = cv.findFundamentalMat(pts1,pts2,cv.FM_RANSAC, ransacReprojThreshold=params["ransacRepThresh"], confidence=params["conf"])
 
-	F, mask = cv.findFundamentalMat(pts1,pts2,cv.FM_RANSAC, ransacReprojThreshold=ransacRepThresh, confidence=conf) # 0.05, 0.99999
-
-	pts1 = pts1[mask.ravel()==1] #select inlier points
+	#Select inlier points
+	pts1 = pts1[mask.ravel()==1]
 	pts2 = pts2[mask.ravel()==1]
 
 	print("Writing to file")
@@ -123,27 +120,19 @@ if (len(sys.argv) > 1):
 else:
 	print("Set command argument to change detector")
 
-
-# for i in range(1,8): #will do 6 detections
-# 	img1 = cv.imread('./Photos/'+ str(i) + '.jpg')
-# 	img2 = cv.imread('./Photos/'+ str(i+1) + '.jpg')
-# 	gray1= cv.cvtColor(img1,cv.COLOR_BGR2GRAY)
-# 	gray2= cv.cvtColor(img2,cv.COLOR_BGR2GRAY)
-
-# 	print("DETECT+MATCH FOR IMAGE: ", i)
-# 	pts1, pts2 = detect(gray1, gray2, use_sift, use_orb, str(i))
 img1 = cv.imread('./Photos/glosh1.jpg')
 img2 = cv.imread('./Photos/glosh2.jpg')
 gray1= cv.cvtColor(img1,cv.COLOR_BGR2GRAY)
 gray2= cv.cvtColor(img2,cv.COLOR_BGR2GRAY)
 
-print("DETECT+MATCH FOR IMAGE: ", 1)
 pts1, pts2 = detect_and_match(gray1, gray2, use_sift, use_orb,'1')
+
 ####   Visualizing
 print("plotting figures")
 #IMAGE 1
 plt.figure("Detections in image1")
 plt.plot(pts1[:,0], pts1[:,1], 'ro')
+
 #numbers in plot
 for p in range(len(pts1)):
 	plt.text(pts1[p][0], pts1[p][1], str(p+1), color="black", fontsize=10)
@@ -152,6 +141,7 @@ plt.imshow(gray1, cmap='gray')
 # IMAGE 2
 plt.figure("Detections in image2")
 plt.plot(pts2[:,0], pts2[:,1], 'bo')
+
 #numbers in plot
 for p in range(len(pts2)):
 	plt.text(pts2[p][0], pts2[p][1], str(p+1), color="black", fontsize=10)

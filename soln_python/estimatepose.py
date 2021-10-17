@@ -36,15 +36,22 @@ def findT(match,pic1,pic2,K): #find transform
     Rts = motion_from_essential(E)
     R,t = choose_solution(uv1, uv2, K, K, Rts)
     P1,P2 = camera_matrices(K, K, R, t)
-    print(R)
-    print(t)
+
+
     x=t[0]
     y=t[1]
     z=t[2]
-    trans_1_2=np.array([[1,0,0,-x],[0,1,0,y],[0,0,1,-z],[0,0,0,1]])
+
+    trans_1_2=np.array([[1,0,0,-x],
+                        [0,1,0,y],
+                        [0,0,1,-z],
+                        [0,0,0,1]])
 
     #Rotation in an array
-    rot_1_2=np.array([[R[0,0],R[0,1],R[0,2],0],[R[1,0],R[1,1],R[1,2],0],[R[2,0],R[2,1],R[2,2],0],[0,0,0,1]])
+    rot_1_2=np.array([[R[0,0],R[0,1],R[0,2],0],
+                    [R[1,0],R[1,1],R[1,2],0],
+                    [R[2,0],R[2,1],R[2,2],0],
+                    [0,0,0,1]])
     
     # Uncomment for task 4b
     # uv1 = np.loadtxt('../data/goodPoints.txt')
