@@ -83,8 +83,10 @@ def findT(match,pic1,pic2,K): #find transform
     return T_v@T_r,X,trans_1_2@rot_1_2,colors #Entire transformation
 
 
+#K1 = np.loadtxt('../data/K_p20.txt')
+#K2 = K1
 K1 = np.loadtxt('../data/K_p20.txt')
-K2 = K1
+K2 = np.loadtxt('../data/K_p20.txt')
 T0 = np.eye(4)
 T1=np.eye(4)
 plt.figure(figsize=(6,6))

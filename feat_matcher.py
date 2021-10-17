@@ -3,22 +3,31 @@ import numpy as np
 from matplotlib import pyplot as plt
 import sys
 
-def detect(gray1, gray2, use_sift, use_orb, detect_num):
+def detect_and_match(gray1, gray2, use_sift, use_orb, detect_num):
+	"""
+	Detects features using SIFT or ORB
+	Uses FLANN feature matcher
+	Filter out using Lowes ratio test
+	Filters out outliers using Ransac (from find fundamental matrix)
+
+
+	"""
+
 	#Detectors
 	if use_sift:
 		print("feature detection (SIFT)")
 
-		#TUNE PARAMSd
+		#Tunable parameters
 		ransacRepThresh = 0.99999
 		conf = 0.05
-		alpha = 0.4 #TUNE
+		alpha = 0.3 # Lowes ratio test
 
 		#Sift object
 		sift = cv.xfeatures2d.SIFT_create(contrastThreshold = 0.07, sigma = 2.4)#(3,0.04, 10,1.4)
 
 		#Detection - SIFT
 		kp1, des1 = sift.detectAndCompute(gray1,None) #Descriptor also computed
-		kp2, des2 = sift.detectAndCompute(gray2,None) #Descriptor also computed
+		kp2, des2 = sift.detectAndCompute(gray2,None)
 
 		#Initialize FLANN for SIFT
 		FLANN_INDEX_KDTREE = 1
@@ -26,10 +35,10 @@ def detect(gray1, gray2, use_sift, use_orb, detect_num):
 	elif use_orb:
 		print("feature detection (ORB)")
 		
-		#TUNE PARAMSd
+		#Tunable parameters
 		ransacRepThresh = 0.99999
 		conf = 0.05
-		alpha = 0.5 #TUNE
+		alpha = 0.5 #Lowes ratio test
 		orb = cv.ORB_create()
 
 		#orb for img1
@@ -55,14 +64,12 @@ def detect(gray1, gray2, use_sift, use_orb, detect_num):
 	matches = flann.knnMatch(des1,des2,k=2)
 
 	# Lowes ratio test - Only keep good matches (stored in pts1, pts2)
+	#Also called the 
 	print("Lowes ratio test")
 	pts1 = []
 	pts2 = []
 	matchesMask = [[0,0] for i in range(len(matches))]
 	for i,tupl in enumerate(matches):
-		if (len(tupl) == 0):
-			print("weird..")
-			continue
 		m = tupl[0]
 		n = tupl[1]
 		if m.distance < alpha*n.distance:
@@ -77,7 +84,7 @@ def detect(gray1, gray2, use_sift, use_orb, detect_num):
 
 	match_img = cv.drawMatchesKnn(gray1,kp1,gray2,kp2,matches,None,**draw_params)
 
-	plt.figure(1)
+	plt.figure("All matches")
 	plt.imshow(match_img)
 
 	# Remove points that are not fulfilling epipolar constraint
@@ -90,7 +97,7 @@ def detect(gray1, gray2, use_sift, use_orb, detect_num):
 	pts1 = pts1[mask.ravel()==1] #select inlier points
 	pts2 = pts2[mask.ravel()==1]
 
-	print("writing to file")
+	print("Writing to file")
 	if use_orb:
 		np.savetxt('data/matchesORB'+detect_num+'.txt', np.hstack((pts1,pts2)))
 	elif use_sift:
@@ -131,11 +138,11 @@ gray1= cv.cvtColor(img1,cv.COLOR_BGR2GRAY)
 gray2= cv.cvtColor(img2,cv.COLOR_BGR2GRAY)
 
 print("DETECT+MATCH FOR IMAGE: ", 1)
-pts1, pts2 = detect(gray1, gray2, use_sift, use_orb,'1')
+pts1, pts2 = detect_and_match(gray1, gray2, use_sift, use_orb,'1')
 ####   Visualizing
 print("plotting figures")
 #IMAGE 1
-plt.figure(2)
+plt.figure("Detections in image1")
 plt.plot(pts1[:,0], pts1[:,1], 'ro')
 #numbers in plot
 for p in range(len(pts1)):
@@ -143,7 +150,7 @@ for p in range(len(pts1)):
 plt.imshow(gray1, cmap='gray')
 
 # IMAGE 2
-plt.figure(3)
+plt.figure("Detections in image2")
 plt.plot(pts2[:,0], pts2[:,1], 'bo')
 #numbers in plot
 for p in range(len(pts2)):
