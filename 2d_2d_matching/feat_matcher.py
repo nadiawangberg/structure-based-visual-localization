@@ -96,18 +96,12 @@ def detect_and_match(gray1, gray2, use_sift, use_orb, detect_num):
 
 	print("Writing to file")
 	if use_orb:
-		np.savetxt('data/matchesORB'+detect_num+'.txt', np.hstack((pts1,pts2)))
+		np.savetxt('../data/matchesORB'+detect_num+'.txt', np.hstack((pts1,pts2)))
 	elif use_sift:
-		np.savetxt('data/matchesSIFT'+detect_num+'.txt', np.hstack((pts1,pts2)))
+		np.savetxt('../data/matchesSIFT'+detect_num+'.txt', np.hstack((pts1,pts2)))
 
 	return pts1, pts2
 
-
-#INITIALIZIATION
-img1 = cv.imread('./Photos/glosh1.jpg')
-img2 = cv.imread('./Photos/glosh2.jpg')
-gray1= cv.cvtColor(img1,cv.COLOR_BGR2GRAY)
-gray2= cv.cvtColor(img2,cv.COLOR_BGR2GRAY)
 
 #Default
 use_sift = True
@@ -120,8 +114,8 @@ if (len(sys.argv) > 1):
 else:
 	print("Set command argument to change detector")
 
-img1 = cv.imread('./Photos/glosh1.jpg')
-img2 = cv.imread('./Photos/glosh2.jpg')
+img1 = cv.imread('../data/glosh1.jpg')
+img2 = cv.imread('../data/glosh2.jpg')
 gray1= cv.cvtColor(img1,cv.COLOR_BGR2GRAY)
 gray2= cv.cvtColor(img2,cv.COLOR_BGR2GRAY)
 
